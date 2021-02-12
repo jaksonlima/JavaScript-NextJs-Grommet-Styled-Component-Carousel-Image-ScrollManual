@@ -8,8 +8,12 @@
     "start": "next start"
   },
   "dependencies": {
+    "grommet": "^2.16.3",
+    "grommet-icons": "^4.5.0",
+    "grommet-nextjs": "^1.0.0",
     "next": "10.0.6",
     "react": "17.0.1",
-    "react-dom": "17.0.1"
+    "react-dom": "17.0.1",
+    "styled-components": "^5.2.1"
   }
 }

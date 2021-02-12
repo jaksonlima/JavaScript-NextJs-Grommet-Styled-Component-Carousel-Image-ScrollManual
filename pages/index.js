@@ -1,65 +1,93 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import { useCallback, useRef } from "react";
+import { Box, Button, Image } from "grommet";
+import { Next, Previous } from "grommet-icons";
+import styled from "styled-components";
 
-export default function Home() {
+import Header from "../src/components/Header";
+
+const BoxButton = styled(Box)`
+  min-width: fit-content;
+  background-color: #009dea94;
+  border-radius: 4px;
+  position: sticky;
+  right: 0;
+  left: 0;
+
+  display: flex;
+  justify-content: center;
+`;
+const BoxScrollContainer = styled(Box)`
+  overflow-x: scroll;
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+  }
+`;
+
+function Home({ data }) {
+  const refScroll = useRef(null);
+
+  const handleScrollPrevius = useCallback(() => {
+    refScroll.current.scrollLeft -= 100;
+  }, []);
+
+  const handleScrollNext = useCallback(() => {
+    refScroll.current.scrollLeft += 100;
+  }, []);
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <>
+      <Header title="Image" />
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+      <Box direction="row" margin="small">
+        <Box basis="medium" elevation="medium">
+          Images
+        </Box>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+        <Box direction="row" margin={{ left: "5px" }} basis="1/2">
+          <BoxScrollContainer direction="row" elevation="medium" ref={refScroll}>
+            <BoxButton>
+              <Button onClick={handleScrollPrevius} focusIndicator={false}>
+                <Previous />
+              </Button>
+            </BoxButton>
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+            {data.slice(0, 10).map(({ id, thumbnailUrl }) => (
+              <Box key={id} width={{ min: "fit-content" }}>
+                <Image src={thumbnailUrl} />
+              </Box>
+            ))}
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  )
+            <BoxButton>
+              <Button onClick={handleScrollNext} focusIndicator={false}>
+                <Next />
+              </Button>
+            </BoxButton>
+          </BoxScrollContainer>
+        </Box>
+      </Box>
+    </>
+  );
 }
+
+Home.getInitialProps = async (ctx) => {
+  const response = await fetch("https://jsonplaceholder.typicode.com/photos?albumId=1");
+  const data = await response.json();
+
+  return {
+    data,
+  };
+};
+
+export default Home;
